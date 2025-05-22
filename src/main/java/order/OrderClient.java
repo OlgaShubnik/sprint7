@@ -27,26 +27,6 @@ public class OrderClient extends BaseClient {
                 .get(ORDER_URL);
     }
 
-    //"Получение деталей заказа по номеру отслеживания"
-    public Response getOrderDetails(int track) {
-        return given()
-                .spec(getBaseSpec())
-                .and()
-                .queryParam("t", track)
-                .when()
-                .get(ORDER_URL + "/track");
-    }
-
-    //"Принять заказ курьером"
-    public Response acceptOrder(int orderId, int courierId) {
-        return given()
-                .spec(getBaseSpec())
-                .and()
-                .queryParam("courierId", courierId)
-                .when()
-                .get(ORDER_URL + "accept/" + orderId);
-    }
-
     //"Отмена заказа"
     public Response cancelOrder(int trackId) {
         return given()

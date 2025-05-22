@@ -1,30 +1,22 @@
 package clients;
 
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import models.Courier;
 import models.CourierCreds;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static generators.CourierGenerator.randomCourier;
+import static org.apache.http.HttpStatus.*;
 import static org.junit.Assert.assertEquals;
 import static utils.Utils.randomString;
 
 public class CourierCreationTest {
 
-    private static final String BASE_URL = "https://qa-scooter.praktikum-services.ru";
-
     private final CourierClient courierClient = new CourierClient();
 
     private String id;
-
-    @Before
-    public void setUp() {
-        RestAssured.baseURI = BASE_URL;
-    }
 
     @Test
     @DisplayName("Курьера можно создать, код ответа 200, запрос возвращает 'ok: true'")
@@ -34,10 +26,10 @@ public class CourierCreationTest {
         Response response = courierClient.create(courier);
         Response loginResponse = courierClient.login(CourierCreds.credsFromCourier(courier));
 
-        assertEquals("Неверный статус код", 201, response.statusCode());
+        assertEquals("Неверный статус код", SC_CREATED, response.statusCode());
         assertEquals(true, response.body().path("ok"));
         id = loginResponse.path("id").toString();
-        assertEquals("Курьер не залогинен", 200, loginResponse.statusCode());
+        assertEquals("Курьер не залогинен", SC_OK, loginResponse.statusCode());
 
     }
 
@@ -47,13 +39,10 @@ public class CourierCreationTest {
         Courier courier = randomCourier();
         courierClient.create(courier);
 
-        Courier sameLoginCourier = new Courier()
-                .setLogin(courier.getLogin())
-                .setPassword(randomString(8))
-                .setFirstName(randomString(8));
+        Courier sameLoginCourier = new Courier(courier.getLogin(), randomString(8), randomString(8));
         Response finalResponse = courierClient.create(sameLoginCourier);
 
-        assertEquals("Код не соотвествует ожидаемому 409", 409, finalResponse.statusCode());
+        assertEquals("Код не соотвествует ожидаемому 409", SC_CONFLICT, finalResponse.statusCode());
         assertEquals("Этот логин уже используется. Попробуйте другой.", finalResponse.body().path("message"));
     }
 
@@ -64,7 +53,7 @@ public class CourierCreationTest {
         courier.setLogin(null);
         Response response = courierClient.create(courier);
 
-        assertEquals("Код не соотвествует ожидаемому 400", 400, response.statusCode());
+        assertEquals("Код не соотвествует ожидаемому 400", SC_BAD_REQUEST, response.statusCode());
         assertEquals("Недостаточно данных для создания учетной записи", response.body().path("message"));
     }
 
@@ -75,7 +64,7 @@ public class CourierCreationTest {
         courier.setPassword(null);
         Response response = courierClient.create(courier);
 
-        assertEquals("Код не соотвествует ожидаемому 400", 400, response.statusCode());
+        assertEquals("Код не соотвествует ожидаемому 400", SC_BAD_REQUEST, response.statusCode());
         assertEquals("Недостаточно данных для создания учетной записи", response.body().path("message"));
     }
 

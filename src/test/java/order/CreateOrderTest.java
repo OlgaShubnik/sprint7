@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -51,7 +52,7 @@ public class CreateOrderTest {
         Response response = orderClient.create(order);
         orderTrack = response.body().path("track");
 
-        assertEquals("Код не соотвествует ожидаемому 201", 201, response.statusCode());
+        assertEquals("Код не соотвествует ожидаемому 201", SC_CREATED, response.statusCode());
         assertNotNull(response.body().path("track"));
     }
 

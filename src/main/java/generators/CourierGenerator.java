@@ -7,9 +7,6 @@ import static utils.Utils.randomString;
 public class CourierGenerator {
 
     public static Courier randomCourier() {
-        return new Courier()
-                .setLogin(randomString())
-                .setPassword(randomString())
-                .setFirstName(randomString());
+        return new Courier(randomString(), randomString(), randomString());
     }
 }

@@ -1,24 +1,20 @@
 package clients;
 
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import models.Courier;
 import models.CourierCreds;
+import utils.BaseClient;
 
 import static io.restassured.RestAssured.given;
 
-public class CourierClient {
+public class CourierClient extends BaseClient {
 
     private static final String API_V1_COURIER = "api/v1/courier";
     private static final String API_V1_COURIER_LOGIN = "api/v1/courier/login";
 
-    public CourierClient() {
-        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru";
-    }
-
     public Response create(Courier courier) {
         return given()
-                .header("Content-type", "application/json")
+                .spec(getBaseSpec())
                 .and()
                 .body(courier)
                 .when()
@@ -27,7 +23,7 @@ public class CourierClient {
 
     public Response login(CourierCreds creds) {
         return given()
-                .header("Content-type", "application/json")
+                .spec(getBaseSpec())
                 .and()
                 .body(creds)
                 .when()
@@ -36,7 +32,7 @@ public class CourierClient {
 
     public Response delete(int id) {
         return given()
-                .header("Content-type", "application/json")
+                .spec(getBaseSpec())
                 .when()
                 .delete(API_V1_COURIER + "/" + id);
     }

@@ -1,30 +1,23 @@
 package clients;
 
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import models.Courier;
 import models.CourierCreds;
 import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static generators.CourierGenerator.randomCourier;
+import static org.apache.http.HttpStatus.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static utils.Utils.randomString;
 
 public class CourierLoginTest {
-    private static final String BASE_URL = "https://qa-scooter.praktikum-services.ru";
 
     private final CourierClient courierClient = new CourierClient();
 
     private String id;
-
-    @Before
-    public void setUp() {
-        RestAssured.baseURI = BASE_URL;
-    }
 
     @Test
     @DisplayName("Курьер может авторизоваться, успешный запрос возвращает 'id'")
@@ -34,7 +27,7 @@ public class CourierLoginTest {
         Response loginResponse = courierClient.login(CourierCreds.credsFromCourier(courier));
         id = loginResponse.body().path("id").toString();
 
-        assertEquals("Курьер не залогинен", 200, loginResponse.statusCode());
+        assertEquals("Курьер не залогинен", SC_OK, loginResponse.statusCode());
         assertNotNull(loginResponse.body().path("id"));
     }
 
@@ -47,7 +40,7 @@ public class CourierLoginTest {
         courierCreds.setLogin(null);
         Response loginResponse = courierClient.login(courierCreds);
 
-        assertEquals("Неправильный код ответа", 400, loginResponse.statusCode());
+        assertEquals("Неправильный код ответа", SC_BAD_REQUEST, loginResponse.statusCode());
         assertEquals("Недостаточно данных для входа", loginResponse.body().path("message"));
     }
 
@@ -60,7 +53,7 @@ public class CourierLoginTest {
         courierCreds.setPassword("");
         Response loginResponse = courierClient.login(courierCreds);
 
-        assertEquals("Неправильный код ответа", 400, loginResponse.statusCode());
+        assertEquals("Неправильный код ответа", SC_BAD_REQUEST, loginResponse.statusCode());
         assertEquals("Недостаточно данных для входа", loginResponse.body().path("message"));
     }
 
@@ -73,7 +66,7 @@ public class CourierLoginTest {
         courierCreds.setLogin(randomString(10));
         Response loginResponse = courierClient.login(courierCreds);
 
-        assertEquals("Неправильный код ответа", 404, loginResponse.statusCode());
+        assertEquals("Неправильный код ответа", SC_NOT_FOUND, loginResponse.statusCode());
         assertEquals("Учетная запись не найдена", loginResponse.body().path("message"));
     }
 
@@ -86,7 +79,7 @@ public class CourierLoginTest {
         courierCreds.setPassword(randomString(10));
         Response loginResponse = courierClient.login(courierCreds);
 
-        assertEquals("Неправильный код ответа", 404, loginResponse.statusCode());
+        assertEquals("Неправильный код ответа", SC_NOT_FOUND, loginResponse.statusCode());
         assertEquals("Учетная запись не найдена", loginResponse.body().path("message"));
     }
 
